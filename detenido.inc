@@ -141,3 +141,55 @@ stock Float: Distancia_Jugadores(player_x, player_y)
 	GetPlayerPos(player_y, x2, y2, z2);
 	return VectorSize(x-x2, y-y2, z-z2);
 }
+
+stock JugadorEstadoEsposad(suspenid)
+{
+	return (Estado_suspendido{suspenid}) ? (1) : (0);
+}
+
+
+stock EstablecerS(suspenid, Float: look_x, Float: look_y)
+{
+	new 
+		Float: x,
+		Float: y,
+		Float: a;
+
+	GetPlayerPos(suspenid, x, y, a);
+	a = atan2(look_y - y, look_x - x) - 90.0;
+	SetPlayerFacingAngle(suspenid, a);
+	return 1;
+}
+
+stock VerificarAsientos(vehicleid)
+{
+    new
+        tmp,
+        seat;
+
+#if defined foreach  
+    foreach(Player, i)
+#else
+    for(new i = 0; i < GetPlayerPoolSize(); i++)
+#endif
+    {
+        if(GetPlayerVehicleID(i) == vehicleid)
+        {
+            if(0 <= (seat = GetPlayerVehicleSeat(i)) < cellbits)
+            {
+                tmp |= 1 << seat;
+            }
+        }
+    }
+
+    tmp = ~tmp;
+    for(new i = 1; i < vehiculos_asientos[GetVehicleModel(vehicleid) - 400];
+    	i++)
+    {
+    	if((~(tmp - 1) & tmp) == 1 << i)
+    	{
+    		return i;
+    	}
+    }
+    return -1;
+}
