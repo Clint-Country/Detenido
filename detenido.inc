@@ -193,3 +193,60 @@ stock VerificarAsientos(vehicleid)
     }
     return -1;
 }
+
+forward ActualizacionS(suspenid);
+public ActualizacionS(suspenid)
+{
+	if(Estado_suspendido{suspenid} == VERIFICAR_ESTADO_SEGUIRME ||
+		Estado_suspendido{suspenid} == VERIFICAR_ESTADO_ESPERA)
+	{
+		new
+			Float: x,
+			Float: y,
+			Float: z,
+			Float: distance;
+
+		GetPlayerPos(detenid[suspenid], x, y, z);
+		distance =
+			Distancia_Jugadores(detenid[suspenid], suspenid);
+
+		if(distance > RANGO_TP)
+		{
+			new Float: a;
+			GetPlayerFacingAngle(detenid[suspenid], a);
+
+			x += ((RANGO_DE_CORRER - 1.0 > 0.0) ?
+				(RANGO_DE_CORRER - 1.0) : (1.0)) * floatsin(-a, degrees);
+			y += ((RANGO_DE_CORRER - 1.0 > 0.0) ?
+				(RANGO_DE_CORRER - 1.0) : (1.0)) * floatcos(-a, degrees);
+			Estado_suspendido{suspenid} = VERIFICAR_ESTADO_ESPERA;
+
+			SetPlayerPos(suspenid, x, y, z);
+			goto rest_actualizacion;
+		}
+
+		else if(distance > RANGO_DE_CORRER)
+		{
+			if(Estado_suspendido{suspenid} == VERIFICAR_ESTADO_ESPERA)
+			{
+				TogglePlayerControllable(suspenid, 1);
+				ApplyAnimation(suspenid, "ped", "run_civi",
+					4.1, 1, 1, 1, 0, 0, 1);
+
+				Estado_suspendido{suspenid} = VERIFICAR_ESTADO_SEGUIRME;
+			}
+		}
+
+		else if(distance < RANGO_DE_CORRER && VERIFICAR_ESTADO_SEGUIRME)
+		{
+			TogglePlayerControllable(suspenid, 0);
+			Estado_suspendido{suspenid} = VERIFICAR_ESTADO_ESPERA;
+		}
+
+		rest_actualizacion:
+		EstablecerS(suspenid, x, y);
+		SetTimerEx("ActualizacionS", ACTUALIZACION_IN, 0, 
+			"i", suspenid);
+	}
+	return 1;
+}
