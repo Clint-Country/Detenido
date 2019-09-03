@@ -283,3 +283,42 @@ public OnPlayerDisconnect(playerid, reason)
 #if defined pig_OnPlayerDisconnect
 	forward pig_OnPlayerDisconnect(playerid, reason);
 #endif
+
+
+public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
+{
+	if(Esposad_playerid[playerid] != INVALID_PLAYER_ID)
+	{
+		SetPlayerInterior(Esposad_playerid[playerid], newinteriorid);
+
+		new
+			Float: x,
+			Float: y,
+			Float: z,
+			Float: a;
+
+		GetPlayerPos(playerid, x, y, z);
+		GetPlayerFacingAngle(playerid, a);
+
+		x += floatsin(-a, degrees);
+		y += floatcos(-a, degrees);
+
+		SetPlayerPos(Esposad_playerid[playerid], x, y, z);
+	}
+	#if defined pig_OnPlayerInteriorChange
+		return pig_OnPlayerInteriorChange(playerid, newinteriorid,
+			oldinteriorid);
+	#else
+		return 1;
+	#endif
+}
+#if defined _ALS_OnPlayerInteriorChange
+	#undef OnPlayerInteriorChange
+#else
+	#define _ALS_OnPlayerInteriorChange
+#endif
+
+#define OnPlayerInteriorChange gc_OnPlayerInteriorChange
+#if defined pig_OnPlayerInteriorChange
+	forward pig_OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid);
+#endif
