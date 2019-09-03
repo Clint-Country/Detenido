@@ -250,3 +250,36 @@ public ActualizacionS(suspenid)
 	}
 	return 1;
 }
+
+public OnPlayerDisconnect(playerid, reason)
+{
+	if(Esposad_playerid[playerid] != INVALID_PLAYER_ID)
+	{
+		Estado_suspendido{Esposad_playerid[playerid]} =
+			VERIFICAR_ESTADO_DESESPOSADO;
+		detenid[Esposad_playerid[playerid]] =
+			Esposad_playerid[playerid] = INVALID_PLAYER_ID;
+	}
+
+	else if(detenid[playerid] != INVALID_PLAYER_ID)
+	{
+		Estado_suspendido{playerid} = VERIFICAR_ESTADO_DESESPOSADO;
+		Esposad_playerid[detenid[playerid]] = detenid[playerid] =
+			INVALID_PLAYER_ID;
+	}
+	#if defined pig_OnPlayerDisconnect
+		return pig_OnPlayerDisconnect(playerid, reason);
+	#else
+		return 1;
+	#endif
+}
+#if defined _ALS_OnPlayerDisconnect
+	#undef OnPlayerDisconnect
+#else
+	#define _ALS_OnPlayerDisconnect
+#endif
+
+#define OnPlayerDisconnect pig_OnPlayerDisconnect
+#if defined pig_OnPlayerDisconnect
+	forward pig_OnPlayerDisconnect(playerid, reason);
+#endif
